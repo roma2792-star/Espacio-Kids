@@ -1,9 +1,10 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" translate="no">
 <head>
     <meta charset="UTF-8">
+    <meta name="google" content="notranslate">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>¡Constructores del Espacio! - Simulador de Misiones</title>
+    <title>Constructores del Espacio</title>
     <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -225,11 +226,10 @@
             50% { transform: translateY(-10px); }
         }
 
-        /* Minijuego Canvas */
         #gameCanvasContainer {
             position: relative;
             width: 100%;
-            max-width: 600px;
+            max-width: 500px;
             margin: 0 auto;
             border-radius: 15px;
             overflow: hidden;
@@ -243,31 +243,36 @@
             display: block;
             background: radial-gradient(circle at center, #1b1464 0%, #050511 100%);
             width: 100%;
-            height: 400px;
+            height: 350px;
         }
 
         .controles-tactiles {
-            display: flex;
+            display: none;
             justify-content: space-between;
-            margin-top: 10px;
-            gap: 10px;
+            margin-top: 15px;
+            gap: 15px;
+            width: 100%;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
         }
 
         .btn-control {
             flex: 1;
-            background: rgba(255,255,255,0.15);
+            background: linear-gradient(135deg, var(--primary), #4834d4);
             border: 2px solid var(--secondary);
             color: white;
-            padding: 12px;
-            font-size: 1.2rem;
-            border-radius: 10px;
+            padding: 18px;
+            font-size: 1.3rem;
+            border-radius: 15px;
             cursor: pointer;
             font-weight: bold;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
         }
 
         .btn-control:active {
-            background: var(--secondary);
-            color: var(--dark);
+            background: var(--success);
+            transform: scale(0.95);
         }
 
         .resultado-card {
@@ -289,7 +294,7 @@
 
     <header>
         <h1>🚀 Constructores del Espacio 🛰️</h1>
-        <p>¡Diseña, arma y pilotea tu propia misión espacial al espacio exterior!</p>
+        <p>¡Diseña, arma y pilotea tu propia misión espacial!</p>
     </header>
 
     <div class="container">
@@ -318,26 +323,26 @@
             </div>
             <div class="recurso-card">
                 <div class="recurso-info">
-                    <span>🔬 Valor Científico</span>
+                    <span>🔬 Ciencia</span>
                     <span id="txt-ciencia">0 Pts</span>
                 </div>
                 <div class="barra-progreso"><div id="bar-ciencia" class="barra-fill" style="width: 0%; background: var(--accent);"></div></div>
             </div>
         </div>
 
-        <!-- PASO 1: OBJETIVO DE MISIÓN -->
+        <!-- PASO 1 -->
         <div id="seccion-1" class="seccion activa">
             <h2>Paso 1: Elige el Objetivo de tu Misión</h2>
             <div class="opciones-grid" id="grid-objetivos"></div>
             <button class="btn" onclick="siguientePaso(2)" id="btn-paso-1" disabled>Siguiente: Órbita y Cohete ➡️</button>
         </div>
 
-        <!-- PASO 2: ÓRBITA Y LANZAMIENTO -->
+        <!-- PASO 2 -->
         <div id="seccion-2" class="seccion">
             <h2>Paso 2: Elige la Órbita y el Cohete</h2>
-            <h3 style="font-size: 1rem; color: var(--secondary); margin-bottom: 10px;">Selecciona la Órbita:</h3>
+            <h3 style="font-size: 1rem; color: var(--secondary); margin-bottom: 10px;">Órbita:</h3>
             <div class="opciones-grid" id="grid-orbitas"></div>
-            <h3 style="font-size: 1rem; color: var(--secondary); margin: 15px 0 10px 0;">Selecciona el Cohete Lanzador:</h3>
+            <h3 style="font-size: 1rem; color: var(--secondary); margin: 15px 0 10px 0;">Cohete Lanzador:</h3>
             <div class="opciones-grid" id="grid-cohetes"></div>
             <div style="display: flex; gap: 10px;">
                 <button class="btn btn-secundario" onclick="siguientePaso(1)">⬅️ Atrás</button>
@@ -345,10 +350,9 @@
             </div>
         </div>
 
-        <!-- PASO 3: NAVE E INSTRUMENTOS -->
+        <!-- PASO 3 -->
         <div id="seccion-3" class="seccion">
             <h2>Paso 3: Construye y Equipa la Nave</h2>
-            <h3 style="font-size: 1rem; color: var(--secondary); margin-bottom: 10px;">Selecciona los Instrumentos Científicos y Subsistemas:</h3>
             <div class="opciones-grid" id="grid-instrumentos"></div>
             <div class="nave-preview" id="preview-nave">🛰️</div>
             <div style="display: flex; gap: 10px;">
@@ -357,27 +361,28 @@
             </div>
         </div>
 
-        <!-- PASO 4: MINIJUEGO DE VUELO Y LANZAMIENTO -->
+        <!-- PASO 4: MINIJUEGO -->
         <div id="seccion-4" class="seccion" style="text-align: center;">
-            <h2>🚀 ¡Despegue y Pilotaje en Tiempo Real!</h2>
-            <p style="margin-bottom: 15px; color: var(--secondary);">¡Usa las flechas del teclado ⬅️ ➡️ o los botones para esquivar los meteoritos mientras tu cohete sube al espacio!</p>
+            <h2>🚀 ¡Despegue y Pilotaje!</h2>
+            <p style="margin-bottom: 15px; color: var(--secondary);">¡Usa los botones para esquivar los meteoritos mientras subes al espacio!</p>
             
             <div id="gameCanvasContainer">
-                <canvas id="spaceCanvas" width="500" height="400"></canvas>
+                <canvas id="spaceCanvas" width="400" height="350"></canvas>
             </div>
-            <div class="controles-tactiles" id="controles-tactiles" style="display: none; max-width: 500px; margin: 10px auto;">
-                <button class="btn-control" onclick="moverNave(-25)">⬅️ Izquierda</button>
-                <button class="btn-control" onclick="moverNave(25)">Derecha ➡️</button>
+            
+            <div class="controles-tactiles" id="controles-tactiles">
+                <button class="btn-control" onclick="moverNave(-30)">⬅️ Izquierda</button>
+                <button class="btn-control" onclick="moverNave(30)">Derecha ➡️</button>
             </div>
 
             <div id="panel-progreso-vuelo" style="margin-top: 15px;">
-                <p>Progreso hacia la órbita: <span id="txt-porcentaje-vuelo">0%</span></p>
-                <div class="barra-progreso" style="max-width: 500px; margin: 8px auto;"><div id="bar-vuelo" class="barra-fill" style="width: 0%; background: var(--success);"></div></div>
-                <p>Escudo de la Nave: <span id="txt-salud">100%</span></p>
+                <p>Progreso a órbita: <span id="txt-porcentaje-vuelo">0%</span></p>
+                <div class="barra-progreso" style="max-width: 400px; margin: 8px auto;"><div id="bar-vuelo" class="barra-fill" style="width: 0%; background: var(--success);"></div></div>
+                <p>Escudo: <span id="txt-salud">100%</span></p>
             </div>
         </div>
 
-        <!-- PASO 5: INFORME FINAL -->
+        <!-- PASO 5: RESULTADO -->
         <div id="seccion-5" class="seccion">
             <h2>📊 Informe de la Misión Espacial</h2>
             <div id="resultado-mision"></div>
@@ -386,32 +391,30 @@
     </div>
 
     <script>
-        // DATOS DEL JUEGO
         const datosJuego = {
             objetivos: [
-                { id: 'tierra', nombre: '🌍 Observar el Clima Terrestre', desc: 'Monitorear huracanes y bosques desde el espacio.', cienciaReq: 40, costo: 15 },
-                { id: 'luna', nombre: '🌕 Explorar la Luna', desc: 'Buscar cráteres y agua congelada en nuestro satélite.', cienciaReq: 60, costo: 25 },
-                { id: 'marte', nombre: '🔴 Buscar Vida en Marte', desc: 'Analizar el suelo rojo en busca de microorganismos.', cienciaReq: 80, costo: 35 }
+                { id: 'tierra', nombre: '🌍 Observar el Clima Terrestre', desc: 'Monitorear huracanes y bosques.', cienciaReq: 40, costo: 15 },
+                { id: 'luna', nombre: '🌕 Explorar la Luna', desc: 'Buscar cráteres y agua congelada.', cienciaReq: 60, costo: 25 },
+                { id: 'marte', nombre: '🔴 Buscar Vida en Marte', desc: 'Analizar el suelo rojo.', cienciaReq: 80, costo: 35 }
             ],
             orbitas: [
-                { id: 'leo', nombre: 'Órbita Baja (LEO)', desc: 'Cerca de casa. Fácil de alcanzar pero cobertura limitada.', costo: 5, masaMax: 3500 },
-                { id: 'polar', nombre: 'Órbita Polar', desc: 'Pasa sobre los polos. Excelente cobertura global.', costo: 10, masaMax: 4000 },
-                { id: 'geo', nombre: 'Órbita Geoestacionaria (GEO)', desc: 'Muy alta. Vista fija de un punto de la Tierra.', costo: 18, masaMax: 4500 }
+                { id: 'leo', nombre: 'Órbita Baja (LEO)', desc: 'Cerca de casa. Fácil de alcanzar.', costo: 5, masaMax: 3500 },
+                { id: 'polar', nombre: 'Órbita Polar', desc: 'Pasa sobre los polos terrestres.', costo: 10, masaMax: 4000 },
+                { id: 'geo', nombre: 'Órbita Geoestacionaria (GEO)', desc: 'Muy alta y fija.', costo: 18, masaMax: 4500 }
             ],
             cohetes: [
-                { id: 'satelito', nombre: 'Cohete Pequeño "MiniSat"', desc: 'Económico pero con poca capacidad de carga.', costo: 10, capacidad: 2000, potenciaBase: 50 },
-                { id: 'falcon', nombre: 'Cohete Mediano "SkyLift"', desc: 'El equilibrio perfecto entre costo y potencia.', costo: 20, capacidad: 3500, potenciaBase: 120 },
-                { id: 'heavy', nombre: 'Cohete Pesado "TitanPro"', desc: 'Gigante y poderoso. Puede llevar cualquier carga.', costo: 32, capacidad: 5000, potenciaBase: 250 }
+                { id: 'satelito', nombre: 'MiniSat', desc: 'Económico y sencillo.', costo: 10, capacidad: 2000, potenciaBase: 50 },
+                { id: 'falcon', nombre: 'SkyLift', desc: 'El equilibrio perfecto.', costo: 20, capacidad: 3500, potenciaBase: 120 },
+                { id: 'heavy', nombre: 'TitanPro', desc: 'Gigante y poderoso.', costo: 32, capacidad: 5000, potenciaBase: 250 }
             ],
             instrumentos: [
-                { id: 'camara', nombre: '📸 Cámara HD', desc: 'Toma fotos espectaculares de la superficie.', costo: 8, masa: 400, potencia: 30, ciencia: 30 },
-                { id: 'espectro', nombre: '🧪 Espectrómetro Químico', desc: 'Analiza de qué están hechos las rocas y el aire.', costo: 12, masa: 600, potencia: 50, ciencia: 45 },
-                { id: 'antena', nombre: '📡 Antena de Datos', desc: 'Transmite mucha información a las estaciones terrestres.', costo: 6, masa: 300, potencia: 40, ciencia: 20 },
-                { id: 'panel', nombre: '☀️ Panel Solar Extra', desc: 'Genera energía limpia para mantener todo encendido.', costo: 5, masa: 250, potencia: -80, ciencia: 10 }
+                { id: 'camara', nombre: '📸 Cámara HD', desc: 'Toma fotos espectaculares.', costo: 8, masa: 400, potencia: 30, ciencia: 30 },
+                { id: 'espectro', nombre: '🧪 Espectrómetro', desc: 'Analiza rocas y atmósfera.', costo: 12, masa: 600, potencia: 50, ciencia: 45 },
+                { id: 'antena', nombre: '📡 Antena de Datos', desc: 'Transmite información.', costo: 6, masa: 300, potencia: 40, ciencia: 20 },
+                { id: 'panel', nombre: '☀️ Panel Solar', desc: 'Genera energía limpia.', costo: 5, masa: 250, potencia: -80, ciencia: 10 }
             ]
         };
 
-        // ESTADO DE LA MISIÓN
         let estado = {
             presupuestoTotal: 50,
             presupuestoGastado: 0,
@@ -425,7 +428,6 @@
             instrumentosSeleccionados: []
         };
 
-        // INICIALIZACIÓN
         function inicializar() {
             renderizarObjetivos();
             renderizarOrbitas();
@@ -441,7 +443,7 @@
                     <h3>${obj.nombre}</h3>
                     <p>${obj.desc}</p>
                     <span class="tag-info">Costo: $${obj.costo}M</span>
-                    <span class="tag-info">Ciencia Requerida: ${obj.cienciaReq} Pts</span>
+                    <span class="tag-info">Ciencia: ${obj.cienciaReq}</span>
                 </div>
             `).join('');
         }
@@ -453,7 +455,7 @@
                     <h3>${orb.nombre}</h3>
                     <p>${orb.desc}</p>
                     <span class="tag-info">Costo: $${orb.costo}M</span>
-                    <span class="tag-info">Masa Máx: ${orb.masaMax} kg</span>
+                    <span class="tag-info">Masa Máx: ${orb.masaMax}kg</span>
                 </div>
             `).join('');
         }
@@ -465,7 +467,7 @@
                     <h3>${cok.nombre}</h3>
                     <p>${cok.desc}</p>
                     <span class="tag-info">Costo: $${cok.costo}M</span>
-                    <span class="tag-info">Capacidad: ${cok.capacidad} kg</span>
+                    <span class="tag-info">Capacidad: ${cok.capacidad}kg</span>
                 </div>
             `).join('');
         }
@@ -476,7 +478,7 @@
                 <div class="opcion-card" onclick="toggleInstrumento('${ins.id}')" id="ins-${ins.id}">
                     <h3>${ins.nombre}</h3>
                     <p>${ins.desc}</p>
-                    <span class="tag-info">Masa: ${ins.masa} kg</span>
+                    <span class="tag-info">Masa: ${ins.masa}kg</span>
                     <span class="tag-info">Potencia: ${ins.potencia}W</span>
                     <span class="tag-info">Ciencia: +${ins.ciencia}</span>
                 </div>
@@ -537,7 +539,7 @@
             estado.instrumentosSeleccionados.forEach(i => {
                 costo += i.costo;
                 masa += i.masa;
-                potencia -= i.potencia; // El consumo resta potencia disponible, paneles suman
+                potencia -= i.potencia;
                 ciencia += i.ciencia;
             });
 
@@ -579,10 +581,9 @@
             document.getElementById(`seccion-${paso}`).classList.add('activa');
         }
 
-        // LÓGICA DEL MINIJUEGO DE VUELO
         let canvas, ctx;
         let juegoActivo = false;
-        let naveX = 225;
+        let naveX = 180;
         let saludNave = 100;
         let progresoVuelo = 0;
         let meteoritos = [];
@@ -591,20 +592,17 @@
 
         function iniciarLanzamiento() {
             if (estado.presupuestoGastado > estado.presupuestoTotal || estado.masaTotal > estado.masaMax) {
-                alert('⚠️ ¡Cuidado! Tu cohete supera el presupuesto o la masa permitida. Revisa los paneles rojos.');
+                alert('⚠️ ¡Atención! Tu cohete supera el presupuesto o la masa permitida.');
                 return;
             }
 
             siguientePaso(4);
             document.getElementById('gameCanvasContainer').style.display = 'block';
-            if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
-                document.getElementById('controles-tactiles').style.display = 'flex';
-            }
+            document.getElementById('controles-tactiles').style.display = 'flex';
 
             canvas = document.getElementById('spaceCanvas');
             ctx = canvas.getContext('2d');
 
-            // Reset variables minijuego
             juegoActivo = true;
             naveX = canvas.width / 2 - 20;
             saludNave = 100;
@@ -626,30 +624,25 @@
         function loopMinijuego() {
             if (!juegoActivo) return;
 
-            // Controles de teclado
-            if (teclas['ArrowLeft'] || teclas['a']) moverNave(-7);
-            if (teclas['ArrowRight'] || teclas['d']) moverNave(7);
+            if (teclas['ArrowLeft'] || teclas['a']) moverNave(-6);
+            if (teclas['ArrowRight'] || teclas['d']) moverNave(6);
 
-            // Actualizar progreso y salud
             progresoVuelo += 0.35;
             document.getElementById('txt-porcentaje-vuelo').innerText = `${Math.floor(progresoVuelo)}%`;
             document.getElementById('bar-vuelo').style.width = `${progresoVuelo}%`;
             document.getElementById('txt-salud').innerText = `${Math.max(0, Math.floor(saludNave))}%`;
 
-            // Generar meteoritos
             if (Math.random() < 0.04) {
                 meteoritos.push({
                     x: Math.random() * (canvas.width - 40),
                     y: -40,
-                    size: 25 + Math.random() * 20,
-                    speed: 3 + Math.random() * 3
+                    size: 25 + Math.random() * 15,
+                    speed: 3 + Math.random() * 2.5
                 });
             }
 
-            // Mover meteoritos
             for (let i = meteoritos.length - 1; i >= 0; i--) {
                 meteoritos[i].y += meteoritos[i].speed;
-                // Colisión con nave (cohete en la parte inferior)
                 let naveY = canvas.height - 70;
                 if (
                     meteoritos[i].x < naveX + 40 &&
@@ -660,7 +653,7 @@
                     saludNave -= 25;
                     meteoritos.splice(i, 1);
                     if (saludNave <= 0) {
-                        finalizarMision(false, "¡El cohete recibió demasiados impactos de meteoritos durante el ascenso!");
+                        finalizarMision(false, "¡El cohete recibió demasiados impactos de meteoritos!");
                         return;
                     }
                 } else if (meteoritos[i].y > canvas.height) {
@@ -668,18 +661,14 @@
                 }
             }
 
-            // Dibujar en Canvas
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            // Fondo de estrellas parpadeantes
             ctx.fillStyle = '#ffffff';
             ctx.fillRect(Math.random() * canvas.width, Math.random() * canvas.height, 2, 2);
 
-            // Dibujar Cohete
             ctx.font = '36px sans-serif';
             ctx.fillText('🚀', naveX, canvas.height - 20);
 
-            // Dibujar Meteoritos
             ctx.font = '28px sans-serif';
             meteoritos.forEach(m => {
                 ctx.fillText('☄️', m.x, m.y);
@@ -714,11 +703,11 @@
                 <h3 style="color: ${misionExitosa ? 'var(--success)' : 'var(--danger)'}; margin-bottom: 10px;">
                     ${misionExitosa ? '🎉 ¡MISIÓN EXITOSA! 🎉' : '❌ LA MISIÓN NECESITA MEJORAS'}
                 </h3>
-                <p style="margin-bottom: 10px;"><strong>Estado del Vuelo:</strong> ${mensajeVuelo}</p>
-                <p style="margin-bottom: 10px;"><strong>Objetivo Científico:</strong> ${cienciaOk ? '✅ Logrado con éxito' : '❌ Faltó valor científico'}</p>
-                <p style="margin-bottom: 10px;"><strong>Presupuesto:</strong> ${presupuestoOk ? '✅ Dentro del límite' : '❌ Presupuesto excedido'}</p>
-                <p style="margin-bottom: 15px;"><strong>Energía y Potencia:</strong> ${potenciaOk ? '✅ Sistemas estables' : '❌ Falta energía en los paneles'}</p>
-                <p style="font-size: 0.9rem; color: var(--secondary);"><em>Lección de ingeniería: En el diseño espacial real, cada decisión de masa, energía y costo afecta directamente el éxito global del equipo. ¡Excelente trabajo explorando las compensaciones!</em></p>
+                <p style="margin-bottom: 10px;"><strong>Vuelo:</strong> ${mensajeVuelo}</p>
+                <p style="margin-bottom: 10px;"><strong>Ciencia:</strong> ${cienciaOk ? '✅ Logrado' : '❌ Faltó valor científico'}</p>
+                <p style="margin-bottom: 10px;"><strong>Presupuesto:</strong> ${presupuestoOk ? '✅ Correcto' : '❌ Excedido'}</p>
+                <p style="margin-bottom: 15px;"><strong>Potencia:</strong> ${potenciaOk ? '✅ Estable' : '❌ Falta energía'}</p>
+                <p style="font-size: 0.9rem; color: var(--secondary);"><em>¡Excelente trabajo explorando las compensaciones de ingeniería!</em></p>
             `;
             document.getElementById('resultado-mision').innerHTML = htmlResultado;
         }
