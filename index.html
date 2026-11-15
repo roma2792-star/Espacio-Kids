@@ -422,3 +422,325 @@
             objetivo: null,
             orbita: null,
             cohete: null,
+            instrumentosSeleccionados: []
+        };
+
+        // INICIALIZACIÓN
+        function inicializar() {
+            renderizarObjetivos();
+            renderizarOrbitas();
+            renderizarCohetes();
+            renderizarInstrumentos();
+            actualizarPanel();
+        }
+
+        function renderizarObjetivos() {
+            const grid = document.getElementById('grid-objetivos');
+            grid.innerHTML = datosJuego.objetivos.map(obj => `
+                <div class="opcion-card" onclick="seleccionar('objetivo', '${obj.id}')" id="obj-${obj.id}">
+                    <h3>${obj.nombre}</h3>
+                    <p>${obj.desc}</p>
+                    <span class="tag-info">Costo: $${obj.costo}M</span>
+                    <span class="tag-info">Ciencia Requerida: ${obj.cienciaReq} Pts</span>
+                </div>
+            `).join('');
+        }
+
+        function renderizarOrbitas() {
+            const grid = document.getElementById('grid-orbitas');
+            grid.innerHTML = datosJuego.orbitas.map(orb => `
+                <div class="opcion-card" onclick="seleccionar('orbita', '${orb.id}')" id="orb-${orb.id}">
+                    <h3>${orb.nombre}</h3>
+                    <p>${orb.desc}</p>
+                    <span class="tag-info">Costo: $${orb.costo}M</span>
+                    <span class="tag-info">Masa Máx: ${orb.masaMax} kg</span>
+                </div>
+            `).join('');
+        }
+
+        function renderizarCohetes() {
+            const grid = document.getElementById('grid-cohetes');
+            grid.innerHTML = datosJuego.cohetes.map(cok => `
+                <div class="opcion-card" onclick="seleccionar('cohete', '${cok.id}')" id="cok-${cok.id}">
+                    <h3>${cok.nombre}</h3>
+                    <p>${cok.desc}</p>
+                    <span class="tag-info">Costo: $${cok.costo}M</span>
+                    <span class="tag-info">Capacidad: ${cok.capacidad} kg</span>
+                </div>
+            `).join('');
+        }
+
+        function renderizarInstrumentos() {
+            const grid = document.getElementById('grid-instrumentos');
+            grid.innerHTML = datosJuego.instrumentos.map(ins => `
+                <div class="opcion-card" onclick="toggleInstrumento('${ins.id}')" id="ins-${ins.id}">
+                    <h3>${ins.nombre}</h3>
+                    <p>${ins.desc}</p>
+                    <span class="tag-info">Masa: ${ins.masa} kg</span>
+                    <span class="tag-info">Potencia: ${ins.potencia}W</span>
+                    <span class="tag-info">Ciencia: +${ins.ciencia}</span>
+                </div>
+            `).join('');
+        }
+
+        function seleccionar(tipo, id) {
+            if (tipo === 'objetivo') {
+                estado.objetivo = datosJuego.objetivos.find(o => o.id === id);
+                document.querySelectorAll('#grid-objetivos .opcion-card').forEach(c => c.classList.remove('seleccionado'));
+                document.getElementById(`obj-${id}`).classList.add('seleccionado');
+                document.getElementById('btn-paso-1').removeAttribute('disabled');
+            } else if (tipo === 'orbita') {
+                estado.orbita = datosJuego.orbitas.find(o => o.id === id);
+                estado.masaMax = estado.orbita.masaMax;
+                document.querySelectorAll('#grid-orbitas .opcion-card').forEach(c => c.classList.remove('seleccionado'));
+                document.getElementById(`orb-${id}`).classList.add('seleccionado');
+                validarPaso2();
+            } else if (tipo === 'cohete') {
+                estado.cohete = datosJuego.cohetes.find(c => c.id === id);
+                document.querySelectorAll('#grid-cohetes .opcion-card').forEach(c => c.classList.remove('seleccionado'));
+                document.getElementById(`cok-${id}`).classList.add('seleccionado');
+                validarPaso2();
+            }
+            recalcularRecursos();
+        }
+
+        function validarPaso2() {
+            if (estado.orbita && estado.cohete) {
+                document.getElementById('btn-paso-2').removeAttribute('disabled');
+            }
+        }
+
+        function toggleInstrumento(id) {
+            const ins = datosJuego.instrumentos.find(i => i.id === id);
+            const index = estado.instrumentosSeleccionados.findIndex(i => i.id === id);
+            const card = document.getElementById(`ins-${id}`);
+
+            if (index > -1) {
+                estado.instrumentosSeleccionados.splice(index, 1);
+                card.classList.remove('seleccionado');
+            } else {
+                estado.instrumentosSeleccionados.push(ins);
+                card.classList.add('seleccionado');
+            }
+            recalcularRecursos();
+        }
+
+        function recalcularRecursos() {
+            let costo = (estado.objetivo ? estado.objetivo.costo : 0) + 
+                        (estado.orbita ? estado.orbita.costo : 0) + 
+                        (estado.cohete ? estado.cohete.costo : 0);
+            
+            let masa = 0;
+            let potencia = estado.cohete ? estado.cohete.potenciaBase : 0;
+            let ciencia = 0;
+
+            estado.instrumentosSeleccionados.forEach(i => {
+                costo += i.costo;
+                masa += i.masa;
+                potencia -= i.potencia; // El consumo resta potencia disponible, paneles suman
+                ciencia += i.ciencia;
+            });
+
+            estado.presupuestoGastado = costo;
+            estado.masaTotal = masa;
+            estado.potenciaTotal = potencia;
+            estado.cienciaTotal = ciencia;
+
+            actualizarPanel();
+        }
+
+        function actualizarPanel() {
+            document.getElementById('txt-presupuesto').innerText = `${estado.presupuestoGastado} / ${estado.presupuestoTotal}M`;
+            let pctPresupuesto = (estado.presupuestoGastado / estado.presupuestoTotal) * 100;
+            let barPresupuesto = document.getElementById('bar-presupuesto');
+            barPresupuesto.style.width = `${Math.min(pctPresupuesto, 100)}%`;
+            barPresupuesto.style.background = estado.presupuestoGastado > estado.presupuestoTotal ? 'var(--danger)' : 'var(--success)';
+
+            document.getElementById('txt-masa').innerText = `${estado.masaTotal} / ${estado.masaMax} kg`;
+            let pctMasa = (estado.masaTotal / estado.masaMax) * 100;
+            let barMasa = document.getElementById('bar-masa');
+            barMasa.style.width = `${Math.min(pctMasa, 100)}%`;
+            barMasa.style.background = estado.masaTotal > estado.masaMax ? 'var(--danger)' : 'var(--success)';
+
+            document.getElementById('txt-potencia').innerText = `${estado.potenciaTotal} W`;
+            let barPotencia = document.getElementById('bar-potencia');
+            barPotencia.style.width = `${Math.min((Math.max(estado.potenciaTotal, 0) / 200) * 100, 100)}%`;
+            barPotencia.style.background = estado.potenciaTotal < 0 ? 'var(--danger)' : 'var(--warning)';
+
+            document.getElementById('txt-ciencia').innerText = `${estado.cienciaTotal} Pts`;
+            let cienciaReq = estado.objetivo ? estado.objetivo.cienciaReq : 50;
+            let pctCiencia = (estado.cienciaTotal / cienciaReq) * 100;
+            let barCiencia = document.getElementById('bar-ciencia');
+            barCiencia.style.width = `${Math.min(pctCiencia, 100)}%`;
+        }
+
+        function siguientePaso(paso) {
+            document.querySelectorAll('.seccion').forEach(s => s.classList.remove('activa'));
+            document.getElementById(`seccion-${paso}`).classList.add('activa');
+        }
+
+        // LÓGICA DEL MINIJUEGO DE VUELO
+        let canvas, ctx;
+        let juegoActivo = false;
+        let naveX = 225;
+        let saludNave = 100;
+        let progresoVuelo = 0;
+        let meteoritos = [];
+        let animacionFrameId;
+        let teclas = {};
+
+        function iniciarLanzamiento() {
+            if (estado.presupuestoGastado > estado.presupuestoTotal || estado.masaTotal > estado.masaMax) {
+                alert('⚠️ ¡Cuidado! Tu cohete supera el presupuesto o la masa permitida. Revisa los paneles rojos.');
+                return;
+            }
+
+            siguientePaso(4);
+            document.getElementById('gameCanvasContainer').style.display = 'block';
+            if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+                document.getElementById('controles-tactiles').style.display = 'flex';
+            }
+
+            canvas = document.getElementById('spaceCanvas');
+            ctx = canvas.getContext('2d');
+
+            // Reset variables minijuego
+            juegoActivo = true;
+            naveX = canvas.width / 2 - 20;
+            saludNave = 100;
+            progresoVuelo = 0;
+            meteoritos = [];
+
+            window.addEventListener('keydown', e => teclas[e.key] = true);
+            window.addEventListener('keyup', e => teclas[e.key] = false);
+
+            loopMinijuego();
+        }
+
+        function moverNave(delta) {
+            naveX += delta;
+            if (naveX < 10) naveX = 10;
+            if (naveX > canvas.width - 50) naveX = canvas.width - 50;
+        }
+
+        function loopMinijuego() {
+            if (!juegoActivo) return;
+
+            // Controles de teclado
+            if (teclas['ArrowLeft'] || teclas['a']) moverNave(-7);
+            if (teclas['ArrowRight'] || teclas['d']) moverNave(7);
+
+            // Actualizar progreso y salud
+            progresoVuelo += 0.35;
+            document.getElementById('txt-porcentaje-vuelo').innerText = `${Math.floor(progresoVuelo)}%`;
+            document.getElementById('bar-vuelo').style.width = `${progresoVuelo}%`;
+            document.getElementById('txt-salud').innerText = `${Math.max(0, Math.floor(saludNave))}%`;
+
+            // Generar meteoritos
+            if (Math.random() < 0.04) {
+                meteoritos.push({
+                    x: Math.random() * (canvas.width - 40),
+                    y: -40,
+                    size: 25 + Math.random() * 20,
+                    speed: 3 + Math.random() * 3
+                });
+            }
+
+            // Mover meteoritos
+            for (let i = meteoritos.length - 1; i >= 0; i--) {
+                meteoritos[i].y += meteoritos[i].speed;
+                // Colisión con nave (cohete en la parte inferior)
+                let naveY = canvas.height - 70;
+                if (
+                    meteoritos[i].x < naveX + 40 &&
+                    meteoritos[i].x + meteoritos[i].size > naveX &&
+                    meteoritos[i].y < naveY + 60 &&
+                    meteoritos[i].y + meteoritos[i].size > naveY
+                ) {
+                    saludNave -= 25;
+                    meteoritos.splice(i, 1);
+                    if (saludNave <= 0) {
+                        finalizarMision(false, "¡El cohete recibió demasiados impactos de meteoritos durante el ascenso!");
+                        return;
+                    }
+                } else if (meteoritos[i].y > canvas.height) {
+                    meteoritos.splice(i, 1);
+                }
+            }
+
+            // Dibujar en Canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Fondo de estrellas parpadeantes
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(Math.random() * canvas.width, Math.random() * canvas.height, 2, 2);
+
+            // Dibujar Cohete
+            ctx.font = '36px sans-serif';
+            ctx.fillText('🚀', naveX, canvas.height - 20);
+
+            // Dibujar Meteoritos
+            ctx.font = '28px sans-serif';
+            meteoritos.forEach(m => {
+                ctx.fillText('☄️', m.x, m.y);
+            });
+
+            if (progresoVuelo >= 100) {
+                finalizarMision(true, "¡Órbita alcanzada con éxito y pilotaje completado!");
+                return;
+            }
+
+            animacionFrameId = requestAnimationFrame(loopMinijuego);
+        }
+
+        function finalizarMision(exitoVuelo, mensajeVuelo) {
+            juegoActivo = false;
+            cancelAnimationFrame(animacionFrameId);
+            document.getElementById('gameCanvasContainer').style.display = 'none';
+            document.getElementById('controles-tactiles').style.display = 'none';
+
+            siguientePaso(5);
+
+            let cienciaReq = estado.objetivo ? estado.objetivo.cienciaReq : 50;
+            let cienciaOk = estado.cienciaTotal >= cienciaReq;
+            let presupuestoOk = estado.presupuestoGastado <= estado.presupuestoTotal;
+            let potenciaOk = estado.potenciaTotal >= 0;
+
+            let misionExitosa = exitoVuelo && cienciaOk && presupuestoOk && potenciaOk;
+            let estrellas = misionExitosa ? (saludNave > 70 ? '⭐⭐⭐' : '⭐⭐') : '⭐';
+
+            let htmlResultado = `
+                <div class="estrellas">${estrellas}</div>
+                <h3 style="color: ${misionExitosa ? 'var(--success)' : 'var(--danger)'}; margin-bottom: 10px;">
+                    ${misionExitosa ? '🎉 ¡MISIÓN EXITOSA! 🎉' : '❌ LA MISIÓN NECESITA MEJORAS'}
+                </h3>
+                <p style="margin-bottom: 10px;"><strong>Estado del Vuelo:</strong> ${mensajeVuelo}</p>
+                <p style="margin-bottom: 10px;"><strong>Objetivo Científico:</strong> ${cienciaOk ? '✅ Logrado con éxito' : '❌ Faltó valor científico'}</p>
+                <p style="margin-bottom: 10px;"><strong>Presupuesto:</strong> ${presupuestoOk ? '✅ Dentro del límite' : '❌ Presupuesto excedido'}</p>
+                <p style="margin-bottom: 15px;"><strong>Energía y Potencia:</strong> ${potenciaOk ? '✅ Sistemas estables' : '❌ Falta energía en los paneles'}</p>
+                <p style="font-size: 0.9rem; color: var(--secondary);"><em>Lección de ingeniería: En el diseño espacial real, cada decisión de masa, energía y costo afecta directamente el éxito global del equipo. ¡Excelente trabajo explorando las compensaciones!</em></p>
+            `;
+            document.getElementById('resultado-mision').innerHTML = htmlResultado;
+        }
+
+        function reiniciarJuego() {
+            estado.presupuestoGastado = 0;
+            estado.masaTotal = 0;
+            estado.potenciaTotal = 0;
+            estado.cienciaTotal = 0;
+            estado.objetivo = null;
+            estado.orbita = null;
+            estado.cohete = null;
+            estado.instrumentosSeleccionados = [];
+
+            document.querySelectorAll('.opcion-card').forEach(c => c.classList.remove('seleccionado'));
+            document.getElementById('btn-paso-1').setAttribute('disabled', 'true');
+            document.getElementById('btn-paso-2').setAttribute('disabled', 'true');
+            actualizarPanel();
+            siguientePaso(1);
+        }
+
+        window.onload = inicializar;
+    </script>
+</body>
+</html>
