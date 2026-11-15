@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>¡Constructores del Espacio! - Simulador de Misiones</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #6c5ce7;
+            --secondary: #a29bfe;
+            --accent: #fd79a8;
+            --success: #00b894;
+            --warning: #fdcb6e;
+            --danger: #ff7675;
+            --dark: #0f0c29;
+            --darker: #050511;
+            --light: #f5f6fa;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Fredoka', cursive, sans-serif;
+            user-select: none;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--dark), var(--darker));
+            color: var(--light);
+            min-height: 100vh;
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            color: var(--warning);
+            text-shadow: 0 0 15px rgba(253, 203, 110, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        header p {
+            color: var(--secondary);
+            font-size: 1.1rem;
+            margin-top: 5px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 900px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 25px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            margin-bottom: 30px;
+        }
+
+        .panel-recursos {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .recurso-card {
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 12px;
+            padding: 12px 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .recurso-info {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.95rem;
+            margin-bottom: 6px;
+            font-weight: 600;
+        }
+
+        .barra-progreso {
+            width: 100%;
+            height: 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        .barra-fill {
+            height: 100%;
+            width: 0%;
+            transition: width 0.4s ease, background-color 0.4s ease;
+            border-radius: 6px;
+        }
+
+        .seccion {
+            display: none;
+        }
+
+        .seccion.activa {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h2 {
+            color: var(--accent);
+            margin-bottom: 15px;
+            font-size: 1.6rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .opciones-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .opcion-card {
+            background: rgba(255, 255, 255, 0.07);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: left;
+        }
+
+        .opcion-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--secondary);
+            background: rgba(255, 255, 255, 0.12);
+        }
+
+        .opcion-card.seleccionado {
+            border-color: var(--success);
+            background: rgba(0, 184, 148, 0.2);
+            box-shadow: 0 0 15px rgba(0, 184, 148, 0.4);
+        }
+
+        .opcion-card h3 {
+            font-size: 1.2rem;
+            margin-bottom: 8px;
+            color: var(--light);
+        }
+
+        .opcion-card p {
+            font-size: 0.85rem;
+            color: #dcdde1;
+            margin-bottom: 8px;
+        }
+
+        .tag-info {
+            display: inline-block;
+            font-size: 0.75rem;
+            background: rgba(0,0,0,0.3);
+            padding: 3px 8px;
+            border-radius: 6px;
+            margin-right: 5px;
+            margin-top: 4px;
+            color: var(--warning);
+        }
+
+        .btn {
+            background: linear-gradient(135deg, var(--primary), #4834d4);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(108, 92, 231, 0.4);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 15px;
+        }
+
+        .btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 20px rgba(108, 92, 231, 0.6);
+        }
+
+        .btn-secundario {
+            background: rgba(255, 255, 255, 0.1);
+            box-shadow: none;
+        }
+
+        .btn-secundario:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .nave-preview {
+            text-align: center;
+            margin: 20px 0;
+            font-size: 5rem;
+            animation: flotar 3s ease-in-out infinite;
+        }
+
+        @keyframes flotar {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        /* Minijuego Canvas */
+        #gameCanvasContainer {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+            border-radius: 15px;
+            overflow: hidden;
+            border: 3px solid var(--secondary);
+            box-shadow: 0 0 25px rgba(162, 155, 254, 0.3);
+            display: none;
+            background: #02000f;
+        }
+
+        canvas {
+            display: block;
+            background: radial-gradient(circle at center, #1b1464 0%, #050511 100%);
+            width: 100%;
+            height: 400px;
+        }
+
+        .controles-tactiles {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+            gap: 10px;
+        }
+
+        .btn-control {
+            flex: 1;
+            background: rgba(255,255,255,0.15);
+            border: 2px solid var(--secondary);
+            color: white;
+            padding: 12px;
+            font-size: 1.2rem;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .btn-control:active {
+            background: var(--secondary);
+            color: var(--dark);
+        }
+
+        .resultado-card {
+            background: rgba(0, 0, 0, 0.6);
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 15px;
+            border: 1px solid var(--success);
+        }
+
+        .estrellas {
+            font-size: 2rem;
+            color: var(--warning);
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>🚀 Constructores del Espacio 🛰️</h1>
+        <p>¡Diseña, arma y pilotea tu propia misión espacial al espacio exterior!</p>
+    </header>
+
+    <div class="container">
+        <!-- PANEL DE RECURSOS -->
+        <div class="panel-recursos">
+            <div class="recurso-card">
+                <div class="recurso-info">
+                    <span>💰 Presupuesto</span>
+                    <span id="txt-presupuesto">50 / 50M</span>
+                </div>
+                <div class="barra-progreso"><div id="bar-presupuesto" class="barra-fill" style="width: 100%; background: var(--success);"></div></div>
+            </div>
+            <div class="recurso-card">
+                <div class="recurso-info">
+                    <span>⚖️ Masa Total</span>
+                    <span id="txt-masa">0 / 4500 kg</span>
+                </div>
+                <div class="barra-progreso"><div id="bar-masa" class="barra-fill" style="width: 0%; background: var(--success);"></div></div>
+            </div>
+            <div class="recurso-card">
+                <div class="recurso-info">
+                    <span>⚡ Potencia</span>
+                    <span id="txt-potencia">0 W</span>
+                </div>
+                <div class="barra-progreso"><div id="bar-potencia" class="barra-fill" style="width: 0%; background: var(--warning);"></div></div>
+            </div>
+            <div class="recurso-card">
+                <div class="recurso-info">
+                    <span>🔬 Valor Científico</span>
+                    <span id="txt-ciencia">0 Pts</span>
+                </div>
+                <div class="barra-progreso"><div id="bar-ciencia" class="barra-fill" style="width: 0%; background: var(--accent);"></div></div>
+            </div>
+        </div>
+
+        <!-- PASO 1: OBJETIVO DE MISIÓN -->
+        <div id="seccion-1" class="seccion activa">
+            <h2>Paso 1: Elige el Objetivo de tu Misión</h2>
+            <div class="opciones-grid" id="grid-objetivos"></div>
+            <button class="btn" onclick="siguientePaso(2)" id="btn-paso-1" disabled>Siguiente: Órbita y Cohete ➡️</button>
+        </div>
+
+        <!-- PASO 2: ÓRBITA Y LANZAMIENTO -->
+        <div id="seccion-2" class="seccion">
+            <h2>Paso 2: Elige la Órbita y el Cohete</h2>
+            <h3 style="font-size: 1rem; color: var(--secondary); margin-bottom: 10px;">Selecciona la Órbita:</h3>
+            <div class="opciones-grid" id="grid-orbitas"></div>
+            <h3 style="font-size: 1rem; color: var(--secondary); margin: 15px 0 10px 0;">Selecciona el Cohete Lanzador:</h3>
+            <div class="opciones-grid" id="grid-cohetes"></div>
+            <div style="display: flex; gap: 10px;">
+                <button class="btn btn-secundario" onclick="siguientePaso(1)">⬅️ Atrás</button>
+                <button class="btn" onclick="siguientePaso(3)" id="btn-paso-2" disabled>Siguiente: Diseñar Nave ➡️</button>
+            </div>
+        </div>
+
+        <!-- PASO 3: NAVE E INSTRUMENTOS -->
+        <div id="seccion-3" class="seccion">
+            <h2>Paso 3: Construye y Equipa la Nave</h2>
+            <h3 style="font-size: 1rem; color: var(--secondary); margin-bottom: 10px;">Selecciona los Instrumentos Científicos y Subsistemas:</h3>
+            <div class="opciones-grid" id="grid-instrumentos"></div>
+            <div class="nave-preview" id="preview-nave">🛰️</div>
+            <div style="display: flex; gap: 10px;">
+                <button class="btn btn-secundario" onclick="siguientePaso(2)">⬅️ Atrás</button>
+                <button class="btn" onclick="iniciarLanzamiento()" style="background: linear-gradient(135deg, var(--success), #009432);">🚀 ¡Listo para Lanzar!</button>
+            </div>
+        </div>
+
+        <!-- PASO 4: MINIJUEGO DE VUELO Y LANZAMIENTO -->
+        <div id="seccion-4" class="seccion" style="text-align: center;">
+            <h2>🚀 ¡Despegue y Pilotaje en Tiempo Real!</h2>
+            <p style="margin-bottom: 15px; color: var(--secondary);">¡Usa las flechas del teclado ⬅️ ➡️ o los botones para esquivar los meteoritos mientras tu cohete sube al espacio!</p>
+            
+            <div id="gameCanvasContainer">
+                <canvas id="spaceCanvas" width="500" height="400"></canvas>
+            </div>
+            <div class="controles-tactiles" id="controles-tactiles" style="display: none; max-width: 500px; margin: 10px auto;">
+                <button class="btn-control" onclick="moverNave(-25)">⬅️ Izquierda</button>
+                <button class="btn-control" onclick="moverNave(25)">Derecha ➡️</button>
+            </div>
+
+            <div id="panel-progreso-vuelo" style="margin-top: 15px;">
+                <p>Progreso hacia la órbita: <span id="txt-porcentaje-vuelo">0%</span></p>
+                <div class="barra-progreso" style="max-width: 500px; margin: 8px auto;"><div id="bar-vuelo" class="barra-fill" style="width: 0%; background: var(--success);"></div></div>
+                <p>Escudo de la Nave: <span id="txt-salud">100%</span></p>
+            </div>
+        </div>
+
+        <!-- PASO 5: INFORME FINAL -->
+        <div id="seccion-5" class="seccion">
+            <h2>📊 Informe de la Misión Espacial</h2>
+            <div id="resultado-mision"></div>
+            <button class="btn" onclick="reiniciarJuego()" style="margin-top: 20px;">🔄 Diseñar Nueva Misión</button>
+        </div>
+    </div>
+
+    <script>
+        // DATOS DEL JUEGO
+        const datosJuego = {
+            objetivos: [
+                { id: 'tierra', nombre: '🌍 Observar el Clima Terrestre', desc: 'Monitorear huracanes y bosques desde el espacio.', cienciaReq: 40, costo: 15 },
+                { id: 'luna', nombre: '🌕 Explorar la Luna', desc: 'Buscar cráteres y agua congelada en nuestro satélite.', cienciaReq: 60, costo: 25 },
+                { id: 'marte', nombre: '🔴 Buscar Vida en Marte', desc: 'Analizar el suelo rojo en busca de microorganismos.', cienciaReq: 80, costo: 35 }
+            ],
+            orbitas: [
+                { id: 'leo', nombre: 'Órbita Baja (LEO)', desc: 'Cerca de casa. Fácil de alcanzar pero cobertura limitada.', costo: 5, masaMax: 3500 },
+                { id: 'polar', nombre: 'Órbita Polar', desc: 'Pasa sobre los polos. Excelente cobertura global.', costo: 10, masaMax: 4000 },
+                { id: 'geo', nombre: 'Órbita Geoestacionaria (GEO)', desc: 'Muy alta. Vista fija de un punto de la Tierra.', costo: 18, masaMax: 4500 }
+            ],
+            cohetes: [
+                { id: 'satelito', nombre: 'Cohete Pequeño "MiniSat"', desc: 'Económico pero con poca capacidad de carga.', costo: 10, capacidad: 2000, potenciaBase: 50 },
+                { id: 'falcon', nombre: 'Cohete Mediano "SkyLift"', desc: 'El equilibrio perfecto entre costo y potencia.', costo: 20, capacidad: 3500, potenciaBase: 120 },
+                { id: 'heavy', nombre: 'Cohete Pesado "TitanPro"', desc: 'Gigante y poderoso. Puede llevar cualquier carga.', costo: 32, capacidad: 5000, potenciaBase: 250 }
+            ],
+            instrumentos: [
+                { id: 'camara', nombre: '📸 Cámara HD', desc: 'Toma fotos espectaculares de la superficie.', costo: 8, masa: 400, potencia: 30, ciencia: 30 },
+                { id: 'espectro', nombre: '🧪 Espectrómetro Químico', desc: 'Analiza de qué están hechos las rocas y el aire.', costo: 12, masa: 600, potencia: 50, ciencia: 45 },
+                { id: 'antena', nombre: '📡 Antena de Datos', desc: 'Transmite mucha información a las estaciones terrestres.', costo: 6, masa: 300, potencia: 40, ciencia: 20 },
+                { id: 'panel', nombre: '☀️ Panel Solar Extra', desc: 'Genera energía limpia para mantener todo encendido.', costo: 5, masa: 250, potencia: -80, ciencia: 10 }
+            ]
+        };
+
+        // ESTADO DE LA MISIÓN
+        let estado = {
+            presupuestoTotal: 50,
+            presupuestoGastado: 0,
+            masaTotal: 0,
+            masaMax: 3500,
+            potenciaTotal: 0,
+            cienciaTotal: 0,
+            objetivo: null,
+            orbita: null,
+            cohete: null,
